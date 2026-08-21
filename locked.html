@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Protected</title>
+</head>
+
+<body>
+
+<script>
+(async () => {
+
+    const encryptedData = "kFG3VSkpVGWQinIufMd1WVmgr0/70Q==";
+    const saltData = "R8xfUdQOmH5qS7Hdt93MBw==";
+    const ivData = "LrogF+yF2CCIhaqh";
+
+    function fromBase64(str) {
+        const binary = atob(str);
+        const bytes = new Uint8Array(binary.length);
+
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+
+        return bytes;
+    }
+
+    const password = prompt("Enter password:");
+
+    if (password === null) {
+        document.body.innerHTML = "Access cancelled.";
+        return;
+    }
+
+    try {
+
+        const encoder = new TextEncoder();
+
+        const passwordKey = await crypto.subtle.importKey(
+            "raw",
+            encoder.encode(password),
+            "PBKDF2",
+            false,
+            ["deriveKey"]
+        );
+
+        const key = await crypto.subtle.deriveKey(
+            {
+                name: "PBKDF2",
+                salt: fromBase64(saltData),
+                iterations: 250000,
+                hash: "SHA-256"
+            },
+            passwordKey,
+            {
+                name: "AES-GCM",
+                length: 256
+            },
+            false,
+            ["decrypt"]
+        );
+
+        const decrypted = await crypto.subtle.decrypt(
+            {
+                name: "AES-GCM",
+                iv: fromBase64(ivData),
+                tagLength: 128
+            },
+            key,
+            fromBase64(encryptedData)
+        );
+
+        const html = new TextDecoder().decode(decrypted);
+
+        document.open();
+        document.write(html);
+        document.close();
+
+    } catch (error) {
+
+        document.body.innerHTML = `
+            <h2>Wrong password</h2>
+            <button onclick="location.reload()">Try again</button>
+        `;
+
+    }
+
+})();
+</script>
+
+</body>
+</html>
