@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+          content="width=device-width,
+                   initial-scale=1,
+                   maximum-scale=1,
+                   viewport-fit=cover">
 
     <meta name="theme-color" content="#000000">
 
@@ -14,22 +18,32 @@
         body {
             margin: 0;
             padding: 0;
+
             width: 100%;
             height: 100%;
+
             background: #000;
+
             overflow: hidden;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Helvetica Neue",
+                Arial,
+                sans-serif;
+
             color: rgb(126, 126, 126);
         }
 
-        .error-message {
+        #message {
             position: fixed;
 
             top: 184px;
             left: 50%;
+
             transform: translateX(-50%);
 
             width: 330px;
@@ -45,6 +59,8 @@
 
             letter-spacing: 0;
 
+            white-space: pre-line;
+
             user-select: none;
             -webkit-user-select: none;
         }
@@ -53,10 +69,69 @@
 
 <body>
 
-    <div class="error-message">
-        Safari can’t open the page because<br>
-        the server can’t be found.
-    </div>
+    <div id="message"></div>
+
+    <script>
+        const message = document.getElementById("message");
+
+        const errorText =
+`Safari can’t open the page because
+the server can’t be found.`;
+
+        const kiddingText = "Just kidding...";
+
+        message.textContent = errorText;
+
+        // Wait 5 seconds before doing anything
+        setTimeout(() => {
+
+            const characters = Array.from(errorText);
+
+            // Delete the entire message over exactly 2 seconds
+            const deleteDuration = 2000;
+            const deleteSpeed = deleteDuration / characters.length;
+
+            const deleteInterval = setInterval(() => {
+
+                characters.pop();
+
+                message.textContent = characters.join("");
+
+                if (characters.length === 0) {
+
+                    clearInterval(deleteInterval);
+
+                    // Start typing "Just kidding..."
+                    typeKidding();
+                }
+
+            }, deleteSpeed);
+
+        }, 5000);
+
+
+        function typeKidding() {
+
+            let index = 0;
+
+            // Small pause after the old message disappears
+            setTimeout(() => {
+
+                const typeInterval = setInterval(() => {
+
+                    message.textContent += kiddingText[index];
+
+                    index++;
+
+                    if (index >= kiddingText.length) {
+                        clearInterval(typeInterval);
+                    }
+
+                }, 100);
+
+            }, 250);
+        }
+    </script>
 
 </body>
 </html>
